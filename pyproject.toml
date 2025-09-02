@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trading-strategy-backtester"
+version = "0.1.0"
+description = "An event-driven backtesting engine for trading strategies."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+authors = [
+  { name = "Luke Turnyanskiy", email = "turnyanskiy.luke@gmail.com" }
+]
+
+dependencies = [
+  "pandas>=2.0",
+  "yfinance>=0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "mypy>=1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

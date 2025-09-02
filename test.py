@@ -1,1 +1,1 @@
-import backtester.main
+from backtester import main
