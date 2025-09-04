@@ -147,8 +147,8 @@ class Portfolio:
         history = {
             "portfolio": pd.DataFrame(self._position_history).set_index("datetime"),
             **{
-                ticker: pd.DataFrame(history).set_index("datetime")
-                for ticker, history in self._asset_history.items()
+                ticker: pd.DataFrame(asset_history).set_index("datetime")
+                for ticker, asset_history in self._asset_history.items()
             },
         }
 
@@ -172,7 +172,7 @@ class Portfolio:
         returns: pd.Series = history["portfolio"]["period returns"]
 
         return {
-            "Cumulative Return": returns.cumprod(),
+            "Cumulative Return": (returns + 1).cumprod(),
             "Annulized Volatility": volatility(returns),
             "Annulized Sharpe Ratio": sharpe_ratio(returns),
             "Max Drawdown": max_drawdown(returns),
