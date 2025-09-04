@@ -1,9 +1,11 @@
 """"""
 from dataclasses import asdict, dataclass
+from backtester.metrics import volatility, sharpe_ratio, max_drawdown
 from .events import Event, FillEvent, MarketEvent, SignalEvent, OrderEvent, OrderType
 from typing import Deque
 import pandas as pd
 from collections import defaultdict
+from typing import Any
 
 @dataclass(slots=True)
 class Position:
@@ -38,7 +40,8 @@ class Portfolio:
         self.current_position: dict[str, Position] = defaultdict(Position)
 
         self._latest_market_event: MarketEvent | None = None
-        self._position_history: list[dict[str, dict]] = []
+        self._position_history: list[dict] = []
+        self._asset_history: dict[str, list[dict]] = defaultdict(list)
 
     # TODO: Risk management, position sizing considerations, Exit positions
     def on_signal_event(self, event: SignalEvent) -> None:
@@ -55,27 +58,47 @@ class Portfolio:
         self._latest_market_event = event
         self.current_position[event.symbol].on_market_event(event)
         
-        snapshot = {
+        position_snapshot = {
             'datetime': event.datetime,
             'cash': self.cash,
         }
         
         holding = 0
         for symbol, position  in self.current_position.items():
-            snapshot[f'{symbol} quantity'] = position.quantity
-            snapshot[f'{symbol} market price'] = position.market_price
+            asset_snapshot = asdict(position)
+            asset_snapshot['datetime'] = event.datetime
+            self._asset_history[symbol].append(asset_snapshot)
+
             holding += position.quantity * position.market_price
         
-        snapshot['holding'] = holding
-        snapshot['equity'] = holding + self.cash
+        position_snapshot['holding'] = holding
+        position_snapshot['equity'] = holding + self.cash
 
-        self._position_history.append(snapshot)
+        self._position_history.append(position_snapshot)
+
 
     def on_fill_event(self, event: FillEvent) -> None:
         """"""
         self.current_position[event.symbol].on_fill_event(event)
         self.cash -= event.fill_cost
     
-    # TODO: History outputs + Metrics
-    def get_position_history(self) -> pd.DataFrame:
-        return pd.DataFrame(self._position_history)
+
+    def get_position_history(self) -> dict[str, pd.DataFrame]:
+        """"""
+        history = {
+            'portfolio': pd.DataFrame(self._position_history).set_index('datetime'),
+            **{ticker: pd.DataFrame(history).set_index('datetime') for ticker, history in self._asset_history.items()}
+        }
+        history['portfolio']['period returns'] = (history['portfolio']['equity'].pct_change()).fillna(0)
+        return history
+
+    def summary(self) -> dict[str, Any]:
+        history = self.get_position_history()
+        returns: pd.Series = history['portfolio']['period returns']
+
+        return {
+            'Cumulative Return': returns.sum(),
+            'Annulized Volatility (s.d.)': volatility(returns),
+            'Annulized Sharpe Ratio': sharpe_ratio(returns),
+            'Max Drawdown': max_drawdown(returns)
+        }

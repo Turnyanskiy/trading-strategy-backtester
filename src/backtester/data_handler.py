@@ -4,7 +4,7 @@ from .events import Event
 from typing import Deque
 from .events import MarketEvent
 
-# TODO: Allow datahandler to mange sevral tickers.
+# TODO: Allow datahandler to manage several tickers.
 class DataHandler:
     """"""
 
