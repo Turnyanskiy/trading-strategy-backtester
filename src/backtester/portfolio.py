@@ -102,29 +102,38 @@ class Portfolio:
     def on_market_event(self, event: MarketEvent) -> None:
         """Handle a market event by updating porfolio valuation & saving positions.
 
+        Note:
+            The positions are only saved when the datetime of the event is different
+            from the previous.
+
         Args:
             event (MarketEvent): Latest market event with pricing information.
         """
-        self._latest_market_event = event
         self.current_position[event.symbol].on_market_event(event)
 
-        position_snapshot = {
-            "datetime": event.datetime,
-            "cash": self.cash,
-        }
+        if (
+            self._latest_market_event
+            and event.datetime != self._latest_market_event.datetime
+        ):
+            position_snapshot = {
+                "datetime": event.datetime,
+                "cash": self.cash,
+            }
 
-        holding = 0
-        for symbol, position in self.current_position.items():
-            asset_snapshot = asdict(position)
-            asset_snapshot["datetime"] = event.datetime
-            self._asset_history[symbol].append(asset_snapshot)
+            holding = 0
+            for symbol, position in self.current_position.items():
+                asset_snapshot = asdict(position)
+                asset_snapshot["datetime"] = event.datetime
+                self._asset_history[symbol].append(asset_snapshot)
 
-            holding += position.quantity * position.market_price
+                holding += position.quantity * position.market_price
 
-        position_snapshot["holding"] = holding
-        position_snapshot["equity"] = holding + self.cash
+            position_snapshot["holding"] = holding
+            position_snapshot["equity"] = holding + self.cash
 
-        self._position_history.append(position_snapshot)
+            self._position_history.append(position_snapshot)
+
+        self._latest_market_event = event
 
     def on_fill_event(self, event: FillEvent) -> None:
         """Handle a fill event by updating portfolio costs.
@@ -172,7 +181,7 @@ class Portfolio:
         returns: pd.Series = history["portfolio"]["period returns"]
 
         return {
-            "Cumulative Return": (returns + 1).cumprod(),
+            "Cumulative Return": (returns + 1).prod(),
             "Annulized Volatility": volatility(returns),
             "Annulized Sharpe Ratio": sharpe_ratio(returns),
             "Max Drawdown": max_drawdown(returns),

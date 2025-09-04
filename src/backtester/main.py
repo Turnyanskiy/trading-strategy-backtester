@@ -7,7 +7,7 @@ from .portfolio import Portfolio
 from .strategies import RandomStrategy
 
 # TODO: Create command line tool which uses Hydra to take a config.
-data = DataHandler("AAPL", "2024-01-01", "2024-06-01")
+data = DataHandler(["AAPL", "MSFT"], "2024-01-01", "2024-06-01")
 strategy = RandomStrategy()
 portfolio = Portfolio()
 execution_handler = ExecutionHandler()
@@ -18,5 +18,6 @@ backtester.run()
 history = portfolio.get_position_history()
 print(history["portfolio"])
 print(history["AAPL"])
+print(history["MSFT"])
 
 print(portfolio.summary())
