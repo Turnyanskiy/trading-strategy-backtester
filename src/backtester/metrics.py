@@ -1,14 +1,23 @@
-"""Performance metrics for trading strategy backtesting."""
-import pandas as pd
+"""Metrics module.
+
+This module contains performance metric functions for evaluating trading strategy
+backtesting.
+"""
+
 import numpy as np
+import pandas as pd
 
 
-def volatility(period_returns: pd.Series, periods_per_year: float | None = None) -> float:
+def volatility(
+    period_returns: pd.Series, periods_per_year: float | None = None
+) -> float:
     """Calculate the annualized volatility (standard deviation) of returns.
 
     Args:
-        period_returns (pd.Series): Series of returns (decimal, e.g., 0.01 = 1%) with datetime index.
-        periods_per_year (float, optional): Number of periods in a year. If None, inferred from datetime index.
+        period_returns (pd.Series): Series of returns (decimal, e.g., 0.01 = 1%) with
+            datetime index.
+        periods_per_year (float, optional): Number of periods in a year. If None,
+            inferred from datetime index.
 
     Returns:
         float: Annualized volatility of returns.
@@ -20,13 +29,19 @@ def volatility(period_returns: pd.Series, periods_per_year: float | None = None)
     return period_returns.std() * np.sqrt(periods_per_year)
 
 
-def sharpe_ratio(period_returns: pd.Series, risk_free: float = 0, periods_per_year: float | None = None) -> float:
+def sharpe_ratio(
+    period_returns: pd.Series,
+    risk_free: float = 0,
+    periods_per_year: float | None = None,
+) -> float:
     """Calculate annualized Sharpe ratio.
 
     Args:
-        period_returns (pd.Series): Series of returns (decimal, e.g., 0.01 = 1%) with datetime index.
+        period_returns (pd.Series): Series of returns (decimal, e.g., 0.01 = 1%) with
+            datetime index.
         risk_free (float, optional): Risk-free rate per period.
-        periods_per_year (float, optional): Number of periods in a year. If None, inferred from datetime index.
+        periods_per_year (float, optional): Number of periods in a year. If None,
+            inferred from datetime index.
 
     Returns:
         float: Annualized Sharpe ratio.
@@ -36,7 +51,10 @@ def sharpe_ratio(period_returns: pd.Series, risk_free: float = 0, periods_per_ye
         periods_per_year = pd.Timedelta(days=252) / period_length
 
     excess_returns = period_returns - risk_free
-    return (excess_returns.mean() / volatility(period_returns, periods_per_year=periods_per_year)) * np.sqrt(periods_per_year)
+    return (
+        excess_returns.mean()
+        / volatility(period_returns, periods_per_year=periods_per_year)
+    ) * np.sqrt(periods_per_year)
 
 
 def max_drawdown(period_returns: pd.Series) -> float:
@@ -55,7 +73,10 @@ def max_drawdown(period_returns: pd.Series) -> float:
 
 
 def alpha():
+    """TODO: Implement this function."""
     ...
 
+
 def beta():
+    """TODO: Implement this function."""
     ...
