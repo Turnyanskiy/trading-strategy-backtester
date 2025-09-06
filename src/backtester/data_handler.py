@@ -26,7 +26,7 @@ class DataHandler:
         """Initialize the data handler.
 
         Args:
-            tickers (list[str], str): Ticker(s) symbol to load historical data for.
+            tickers (str | list[str]): Ticker(s) symbol to load historical data for.
             start (str): Start date for historical data (YYYY-MM-DD).
             end (str): End date for historical data (YYYY-MM-DD).
             interval (str, optional): Data frequency (e.g., "1h", "1d"). Defaults to

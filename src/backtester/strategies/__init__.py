@@ -6,7 +6,12 @@ mean reversion, and random strategies.
 
 from .base import Strategy
 from .mean_reversion import MeanReversionStrategy
-from .momentum import MomentumStrategy
+from .momentum import SimpleMomentumStrategy
 from .random import RandomStrategy
 
-__all__ = ["Strategy", "MomentumStrategy", "MeanReversionStrategy", "RandomStrategy"]
+__all__ = [
+    "Strategy",
+    "SimpleMomentumStrategy",
+    "MeanReversionStrategy",
+    "RandomStrategy",
+]

@@ -67,7 +67,7 @@ class Backtester:
 
                 match event:
                     case MarketEvent():
-                        self.strategy.generate_signal(event)
+                        self.strategy.on_market_event(event)
                         self.execution_handler.on_market_event(event)
                         self.portfolio.on_market_event(event)
                     case SignalEvent():

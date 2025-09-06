@@ -26,6 +26,4 @@ class RandomStrategy(Strategy):
         Raises:
             RuntimeError: If the event queue has not been set.
         """
-        if self.event_queue is None:
-            raise RuntimeError("RandomStrategy: event_queue not set")
         self.event_queue.append(SignalEvent(event.symbol, random.uniform(-1, 1)))

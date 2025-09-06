@@ -95,9 +95,10 @@ class Portfolio:
         if self.event_queue is None:
             raise RuntimeError("Portfolio: event_queue is not set")
 
-        self.event_queue.append(
-            OrderEvent(event.symbol, OrderType.MARKET, int(10 * event.strength))
-        )
+        if event.strength:
+            self.event_queue.append(
+                OrderEvent(event.symbol, OrderType.MARKET, int(10 * event.strength))
+            )
 
     def on_market_event(self, event: MarketEvent) -> None:
         """Handle a market event by updating porfolio valuation & saving positions.
@@ -181,7 +182,7 @@ class Portfolio:
         returns: pd.Series = history["portfolio"]["period returns"]
 
         return {
-            "Cumulative Return": (returns + 1).prod(),
+            "Cumulative Return": (returns + 1).prod() - 1,
             "Annulized Volatility": volatility(returns),
             "Annulized Sharpe Ratio": sharpe_ratio(returns),
             "Max Drawdown": max_drawdown(returns),
